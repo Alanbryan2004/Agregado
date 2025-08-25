@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Mantran</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+   body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f3f4f6;
+    }
+    header {
+      background: #1C1C1C;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.5rem;
+    }
+    .tabs {
+      display: flex;
+      background: #32CD32;
+    }
+    .tab {
+      flex: 1;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .tab.active {
+      background: #32CD32;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+      padding: 1rem;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #C0C0C0;
+      color: #fff;
+    }
+    tr:hover {
+      background: #f1f5f9;
+    }
+    tfoot td {
+      font-weight: bold;
+      background: #f9fafb;
+    }
+    .btn-voltar {
+      display: block;
+      margin: 2rem auto;
+      padding: 0.7rem 1.5rem;
+      background: #32CD32;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <header>Dashboard Mantran</header>
+
+  <!-- Abas -->
+  <div class="tabs">
+    <div class="tab active" onclick="openTab('viagens')">Viagens</div>
+    <div class="tab" onclick="openTab('faturamento')">Faturamento</div>
+  </div>
+
+  <!-- Conteúdo da aba VIAGENS -->
+  <div id="viagens" class="tab-content active">
+    <h2>Viagens</h2>
+    <table id="tabelaViagens">
+      <thead>
+        <tr>
+          <th>Destino</th>
+          <th>Qt Pacotes</th>
+          <th>Qt Pacotes Entregues</th>
+          <th>Valor a Receber (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>São Paulo</td><td>150</td><td>140</td><td>35.000,00</td></tr>
+        <tr><td>Rio de Janeiro</td><td>120</td><td>110</td><td>28.000,00</td></tr>
+        <tr><td>Belo Horizonte</td><td>100</td><td>95</td><td>25.000,00</td></tr>
+        <tr><td>Curitiba</td><td>90</td><td>85</td><td>20.000,00</td></tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total</td>
+          <td id="totalPacotes">0</td>
+          <td id="totalEntregues">0</td>
+          <td id="totalReceber">R$ 0,00</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Conteúdo da aba FATURAMENTO -->
+  <div id="faturamento" class="tab-content">
+    <h2>Faturamento Anual</h2>
+    <canvas id="faturamentoChart"></canvas>
+
+      </div>
+
+  <a href="login.html" class="btn-voltar">Voltar ao Menu</a>
+
+  <script>
+    // Função para alternar abas
+    function openTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      document.querySelector(`[onclick="openTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // Função de totalização da aba Viagens
+    function totalizar() {
+      let totalPacotes = 0, totalEntregues = 0, totalReceber = 0;
+
+      document.querySelectorAll("#tabelaViagens tbody tr").forEach(row => {
+        totalPacotes += parseInt(row.cells[1].innerText) || 0;
+        totalEntregues += parseInt(row.cells[2].innerText) || 0;
+        totalReceber += parseFloat(row.cells[3].innerText.replace(/\./g, "").replace(",", ".")) || 0;
+      });
+
+      document.getElementById("totalPacotes").innerText = totalPacotes;
+      document.getElementById("totalEntregues").innerText = totalEntregues;
+      document.getElementById("totalReceber").innerText = "R$ " + totalReceber.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+    }
+    totalizar();
+
+    // Gráfico de faturamento
+    const ctx = document.getElementById('faturamentoChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+        datasets: [{
+          label: 'Receita Realizada (R$)',
+          data: [12000,15000,18000,10000,22000,25000,30000,28000,26000,32000,35000,40000],
+          backgroundColor: 'rgba(37,99,235,0.7)',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => "R$ " + value.toLocaleString("pt-BR")
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
